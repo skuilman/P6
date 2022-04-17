@@ -9,5 +9,5 @@ $ npm start
 
 Launch node server
 
-$ 'cd ./backend'
+$ `cd ./backend`
 $ node server

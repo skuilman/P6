@@ -3,11 +3,13 @@ Build a Secure API for a Review App
 
 Launch front end
 
-$ cd ./frontend
-$ npm start
+* `cd ./frontend`
+* `npm install`
+* `npm start`
 
 
 Launch node server
 
-$ `cd ./backend`
-$ node server
+* `cd ./backend`
+* `npm install`
+* `node server`

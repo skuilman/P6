@@ -4,7 +4,7 @@ Build a Secure API for a Review App
 Launch front end
 
 $ cd ./frontend
-$ ng serve
+$ npm start
 
 
 Launch node server

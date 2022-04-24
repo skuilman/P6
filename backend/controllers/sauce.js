@@ -67,39 +67,76 @@ exports.createSauce = (req, res, next) => {
     );
   };
 
-// Update sauce
-exports.modifySauce = (req, res, next) => {
-  Sauce.findOne({ _id: req.params.id }).then(
-    (sauce) => {
-      if (!sauce) {
-        return res.status(404).json({
-          error: new Error('Object not found')
-        });
-      }
-      if (Sauce.userId !== req.auth.userId) {
-        return res.status(401).json({
-          error: new Error('Authorisation failed')
-        });
-      }
-      if(req.file) {
-        Sauce.findOne({ _id: req.params.id })
-            .then(newSauce => {
-                const last_filename = newSauce.imageUrl.split('/images/')[1];
-                fs.unlink('images/' + last_filename, () => {});
-            })
-            .catch(error => console.log('Removal failed'));
+  exports.modifySauce = (req, res, next) => {
+    let sauce = new Sauce({ _id: req.params._id });
+    if (req.file) {
+      const url = req.protocol + '://' + req.get('host');
+      req.body.sauce = JSON.parse(req.body.sauce);
+      sauce = {
+        name: req.body.sauce.name,
+      manufacturer: req.body.sauce.manufacturer,
+      description: req.body.sauce.description,
+      imageUrl: url + '/images/' + req.file.filename,
+      mainPepper: req.body.sauce. mainPepper,
+      heat: req.body.sauce.heat
+      };
+    } else {
+      sauce = {
+      name: req.body.name,
+      manufacturer: req.body.manufacturer,
+      description: req.body.description,
+      mainPepper: req.body. mainPepper,
+      heat: req.body.heat
+      };
     }
-    setTimeout(() => {
-        const sauceObject = req.file ? {
-        ...JSON.parse(req.body.sauce),
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-        } : { ...req.body };
-        Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
-           .then(() => res.status(200).json({ message: 'Sauce updated'}))
-            .catch(error => res.status(400).json({ error }));
-    }, 250);
-});
-};
+    Sauce.updateOne({_id: req.params.id}, sauce).then(
+      () => {
+        res.status(201).json({
+          message: 'sauce updated successfully!'
+        });
+      }
+    ).catch(
+      (error) => {
+        res.status(400).json({
+          error: error
+        });
+      }
+    );
+  };
+
+// Update sauce
+// exports.modifySauce = (req, res, next) => {
+//  Sauce.findOne({ _id: req.params.id }).then(
+//    (sauce) => {
+//      if (!sauce) {
+//        return res.status(404).json({
+//          error: new Error('Object not found')
+//        });
+//      }
+//      if (Sauce.userId !== req.auth.userId) {
+//        return res.status(401).json({
+//          error: new Error('Authorisation failed')
+//        });
+//      }
+//      if(req.file) {
+//        Sauce.findOne({ _id: req.params.id })
+//            .then(newSauce => {
+//                const last_filename = newSauce.imageUrl.split('/images/')[1];
+//                fs.unlink('images/' + last_filename, () => {});
+//            })
+//            .catch(error => console.log('Removal failed'));
+//    }
+//    setTimeout(() => {
+//        const sauceObject = req.file ? {
+//        ...JSON.parse(req.body.sauce),
+//        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+//        } : { ...req.body };
+//        Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
+//           .then(() => res.status(200).json({ message: 'Sauce updated'}))
+//            .catch(error => res.status(400).json({ error }));
+//    }, 250);
+// });
+// };
 
 // Delete sauce
 exports.deleteOneSauce = (req, res, next) => {
